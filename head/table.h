@@ -5,12 +5,24 @@
 class table
 {
     private:
-        int comprimento_w;
-        int altura_h;
+        int column, row;
     public:
-
-    protected:
-
+        void setColumn(int column)
+        {
+            this->column = column;
+        }
+        int getColumn()
+        {
+            return this->column;
+        }
+        void setRow(int row)
+        {
+            this->row = row;
+        }
+        int getRow()
+        {
+            return this->row;
+        }
 };
 
 #endif // TABLE_H
