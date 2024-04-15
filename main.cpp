@@ -1,6 +1,8 @@
 #include <iostream>
 #include <allegro.h>
 #include <allegro_primitives.h>
+#include <allegro_image.h>
+#include <keyboard.h>
 #include <conio.h>
 #include <stdlib.h>
 
@@ -41,82 +43,64 @@ int main(){
     al_init();
     al_init_primitives_addon();
     al_install_keyboard();
+    al_init_image_addon();
 
     int x=800;
     int y=600;
 
     janela = al_create_display(x, y);
-    fEventos = al_create_event_queue();
+    al_set_window_position(janela, 200,200);
+    al_set_window_title(janela, "RETRO SNAKE");
 
+    ALLEGRO_TIMER *timer = al_create_timer(1.0 / 30.0);
+
+    fEventos = al_create_event_queue();
+    al_register_event_source(fEventos, al_get_display_event_source(janela));
+    al_register_event_source(fEventos, al_get_timer_event_source(timer));
     al_register_event_source(fEventos, al_get_keyboard_event_source());
+
+    ALLEGRO_BITMAP *maca = al_load_bitmap("./png/apple.png");
+    ALLEGRO_BITMAP *bg = al_load_bitmap("./png/background.png");
 
 
     ALLEGRO_COLOR cor_grama = al_map_rgb(1,200,0);
     ALLEGRO_COLOR cor_cobra = al_map_rgb(241, 94,255);
-    ALLEGRO_COLOR cor_maca = al_map_rgb(255,0,0);
 
     int xm = rand() % x;
     int ym = rand() % y;
 
     RETANGULO cCobra = {float(x/2),float(y/2),30,30,0,cor_cobra};
-    RETANGULO maca = {xm, ym, 30, 30, 0, cor_maca};
 
-    bool tecla[4] = {true,false,false,false}; // 0w/1a/2s/3d
-    bool gameover = false;
-    while(!gameover){
+    while(true){
 
         al_wait_for_event_timed(fEventos, &ev, 0.3);
         al_clear_to_color(cor_grama);
-        desenhaRetangulo(maca);
+        al_draw_bitmap(bg, 0, 0, 0);
+        al_draw_bitmap(maca, xm, ym, 0);
         desenhaRetangulo(cCobra);
         al_flip_display();
 
-        if(ev.type == ALLEGRO_EVENT_KEY_DOWN){
-            if(ev.keyboard.keycode == ALLEGRO_KEY_W && !tecla[2]){
-                tecla[0] = true;
-                tecla[1] = false;
-                tecla[2] = false;
-                tecla[3] = false;
-            }
-            if(ev.keyboard.keycode == ALLEGRO_KEY_S && !tecla[0]){
-                tecla[0] = false;
-                tecla[1] = false;
-                tecla[2] = true;
-                tecla[3] = false;
-            }
-            if(ev.keyboard.keycode == ALLEGRO_KEY_A && !tecla[3]){
-                tecla[0] = false;
-                tecla[1] = true;
-                tecla[2] = false;
-                tecla[3] = false;
-            }
-            if(ev.keyboard.keycode == ALLEGRO_KEY_D && !tecla[1]){
-                tecla[0] = false;
-                tecla[1] = false;
-                tecla[2] = false;
-                tecla[3] = true;
-            }
-            if(ev.keyboard.keycode == ALLEGRO_KEY_C){
-                gameover = true;
-            }
-        }
-        if(tecla[0]){
-            cCobra.y1 -= 15;
-        }
-        if(tecla[1]){
-            cCobra.x1 -= 15;
-        }
-        if(tecla[2]){
-            cCobra.y1 += 15;
-        }
-        if(tecla[3]){
-            cCobra.x1 += 15;
+        if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
+            break;
+        }else if(ev.type == ALLEGRO_EVENT_KEY_DOWN){
+                    if(ev.keyboard.keycode == ALLEGRO_KEY_W && true){
+                        cCobra.y1 -= 30;
+                    }else if(ev.keyboard.keycode == ALLEGRO_KEY_S && true ){
+                        cCobra.y1 += 30;
+                    }else if(ev.keyboard.keycode == ALLEGRO_KEY_A && true){
+                        cCobra.x1 -= 30;
+                    }else if(ev.keyboard.keycode == ALLEGRO_KEY_D && true){
+                        cCobra.x1 += 30;
+                    }else if(ev.keyboard.keycode == ALLEGRO_KEY_C){
+                        break;
+                    }
         }
         if (cCobra.x1 < 0 || cCobra.x1 > x || cCobra.y1 < 0 || cCobra.y1> y){
-            gameover = true;
+            break;
         }
-
     }
-    al_flip_display();
-    al_rest(5);
+    al_destroy_bitmap(maca);
+    al_destroy_bitmap(bg);
+    al_destroy_display(janela);
+    al_destroy_event_queue(fEventos);
 }
