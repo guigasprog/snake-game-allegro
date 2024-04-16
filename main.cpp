@@ -13,16 +13,31 @@ ALLEGRO_EVENT_QUEUE *fEventos = NULL;
 ALLEGRO_EVENT ev;
 
 int cellSize = 30;
-int cellCount = 25;
+int cellCount = 20;
 
 class Comida {
 public:
     int positionX = 5;
-    int positionY = 6;
-    ALLEGRO_COLOR cor = al_map_rgb(43, 51,24);
+    int positionY = 4;
+    bool engolida = true;
+    ALLEGRO_BITMAP *objeto;
 
-    void Desenhar(){
-        al_draw_filled_rectangle(positionX * cellSize, positionY * cellSize, (positionX * cellSize) + cellSize, (positionY * cellSize) + cellSize, cor);
+    Comida(){
+        objeto = al_load_bitmap("./png/apple.png");
+    }
+    ~Comida(){
+        al_destroy_bitmap(objeto);
+    }
+
+    void desenhar(){
+        aletorioPosition();
+        this->engolida = false;
+        al_draw_bitmap(objeto,positionX *cellSize, positionY * cellSize,1);
+    }
+
+    void aletorioPosition(){
+        this->positionX = rand() % (cellCount - 1);
+        this->positionY = rand() % (cellCount - 1);
     }
 };
 
@@ -57,8 +72,10 @@ int main(){
     al_init_image_addon();
 
     janela = al_create_display(cellSize * cellCount, cellSize * cellCount);
-    al_set_window_position(janela, 200,200);
+    al_set_window_position(janela, 100,100);
     al_set_window_title(janela, "RETRO SNAKE");
+    al_set_display_icon(janela, al_load_bitmap("./png/apple.png"));
+
 
     float time = (1.0 / 60.0);
     ALLEGRO_TIMER *timer = al_create_timer(time);
@@ -84,13 +101,15 @@ int main(){
 
         al_wait_for_event_timed(fEventos, &ev, 0.06);
         al_clear_to_color(bg);
-        comi.Desenhar();
+        if(comi) comi.desenhar();
+        al_flip_display();
         /*desenhaRetangulo(cCobra);
         al_flip_display();
-
-        if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE){
+        */
+        if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE || ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE){
             break;
-        }else if(ev.type == ALLEGRO_EVENT_KEY_DOWN){
+        }
+        /*else if(ev.type == ALLEGRO_EVENT_KEY_DOWN){
                     if(ev.keyboard.keycode == ALLEGRO_KEY_W && true){
                         cCobra.y1 -= 30;
                     }else if(ev.keyboard.keycode == ALLEGRO_KEY_S && true ){
