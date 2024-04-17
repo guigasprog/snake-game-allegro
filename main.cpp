@@ -125,12 +125,13 @@ int main(){
     Cobra snake = Cobra();
     while(true){
 
-        al_wait_for_event_timed(fEventos, &ev, 0.15);
+        al_wait_for_event_timed(fEventos, &ev, 0.0001);
         al_clear_to_color(bg);
         snake.desenhar();
         comi.desenhar(snake);
 
         //MOVE
+        //if(ev.type == ALLEGRO_EVENT_KEY_DOWN){
         if(ev.keyboard.keycode == ALLEGRO_KEY_W) {
             snake.positionY--;
         } else if(ev.keyboard.keycode == ALLEGRO_KEY_S) {
@@ -139,7 +140,10 @@ int main(){
             snake.positionX--;
         } else if(ev.keyboard.keycode == ALLEGRO_KEY_D) {
             snake.positionX++;
+        } else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE || ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE){
+                    break;
         }
+        //}
         if(snake.positionY == -1) {
             snake.positionY = 20;
         } else if(snake.positionY == 20) {
@@ -154,9 +158,7 @@ int main(){
         /*desenhaRetangulo(cCobra);
         al_flip_display();
         */
-        if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE || ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE){
-            break;
-        }
+
         /*else if(ev.type == ALLEGRO_EVENT_KEY_DOWN){
                     if(ev.keyboard.keycode == ALLEGRO_KEY_W && true){
                         cCobra.y1 -= 30;
@@ -174,6 +176,7 @@ int main(){
             break;
         }
         */
+        al_rest(0.1);
     }
 
     //al_destroy_bitmap(maca);
