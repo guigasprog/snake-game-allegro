@@ -17,21 +17,22 @@ int cellCount = 20;
 
 class Comida {
 public:
-    int positionX = 5;
-    int positionY = 4;
-    bool engolida = true;
+    int positionX;
+    int positionY;
+    //bool engolida = true;
     ALLEGRO_BITMAP *objeto;
 
     Comida(){
         objeto = al_load_bitmap("./png/apple.png");
+        aletorioPosition();
     }
     ~Comida(){
         al_destroy_bitmap(objeto);
     }
 
     void desenhar(){
-        aletorioPosition();
-        this->engolida = false;
+        //aletorioPosition();
+        //this->engolida = false;
         al_draw_bitmap(objeto,positionX *cellSize, positionY * cellSize,1);
     }
 
@@ -94,14 +95,14 @@ int main(){
     ALLEGRO_COLOR cobra = al_map_rgb(43, 51,24);
 
 
-    //RETANGULO cCobra = {float(x/2),float(y/2),30,30,0,cor_cobra};
+
 
     Comida comi = Comida();
     while(true){
 
         al_wait_for_event_timed(fEventos, &ev, 0.06);
         al_clear_to_color(bg);
-        if(comi) comi.desenhar();
+        comi.desenhar();
         al_flip_display();
         /*desenhaRetangulo(cCobra);
         al_flip_display();
