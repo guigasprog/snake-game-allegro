@@ -15,6 +15,29 @@ ALLEGRO_EVENT ev;
 int cellSize = 30;
 int cellCount = 20;
 
+class Cobra {
+public:
+    int positionX;
+    int positionY;
+
+    Cobra(){
+        randomPosition();
+    }
+    void desenhar() {
+        al_draw_filled_rectangle(positionX * cellSize, positionY * cellSize, (positionX * cellSize) + cellSize, (positionY * cellSize) + cellSize, al_map_rgb(255, 140, 0));
+    }
+    void randomPosition(){
+        this->positionX = rand() % (cellCount - 1);
+        this->positionY = rand() % (cellCount - 1);
+    }
+    void setPositionX(int x) {
+        this->positionX = x;
+    }
+    void setPositionY(int y) {
+        this->positionY = y;
+    }
+};
+
 class Comida {
 public:
     int positionX;
@@ -24,19 +47,20 @@ public:
 
     Comida(){
         objeto = al_load_bitmap("./png/apple.png");
-        aletorioPosition();
+        randomPosition();
     }
     ~Comida(){
         al_destroy_bitmap(objeto);
     }
 
-    void desenhar(){
-        //aletorioPosition();
-        //this->engolida = false;
+    void desenhar(Cobra cobra){
+        if(cobra.positionX == this->positionX && cobra.positionY == this->positionY){
+            randomPosition();
+        }
         al_draw_bitmap(objeto,positionX *cellSize, positionY * cellSize,1);
     }
 
-    void aletorioPosition(){
+    void randomPosition(){
         this->positionX = rand() % (cellCount - 1);
         this->positionY = rand() % (cellCount - 1);
     }
@@ -78,7 +102,7 @@ int main(){
     al_set_display_icon(janela, al_load_bitmap("./png/apple.png"));
 
 
-    float time = (1.0 / 60.0);
+    float time = (1.0 / 30.0);
     ALLEGRO_TIMER *timer = al_create_timer(time);
 
     fEventos = al_create_event_queue();
@@ -98,11 +122,34 @@ int main(){
 
 
     Comida comi = Comida();
+    Cobra snake = Cobra();
     while(true){
 
-        al_wait_for_event_timed(fEventos, &ev, 0.06);
+        al_wait_for_event_timed(fEventos, &ev, 0.15);
         al_clear_to_color(bg);
-        comi.desenhar();
+        snake.desenhar();
+        comi.desenhar(snake);
+
+        //MOVE
+        if(ev.keyboard.keycode == ALLEGRO_KEY_W) {
+            snake.positionY--;
+        } else if(ev.keyboard.keycode == ALLEGRO_KEY_S) {
+            snake.positionY++;
+        } else if(ev.keyboard.keycode == ALLEGRO_KEY_A) {
+            snake.positionX--;
+        } else if(ev.keyboard.keycode == ALLEGRO_KEY_D) {
+            snake.positionX++;
+        }
+        if(snake.positionY == -1) {
+            snake.positionY = 20;
+        } else if(snake.positionY == 20) {
+            snake.positionY = 0;
+        } else if(snake.positionX == -1) {
+            snake.positionX = 20;
+        } else if(snake.positionX == 20) {
+            snake.positionX = 0;
+        }
+
         al_flip_display();
         /*desenhaRetangulo(cCobra);
         al_flip_display();
