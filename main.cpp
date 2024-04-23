@@ -107,7 +107,7 @@ int main(){
     Cobra snake = Cobra();
     while(true){
 
-        al_wait_for_event_timed(fEventos, &ev, 0.001);
+        al_wait_for_event_timed(fEventos, &ev, 0.006);
         al_clear_to_color(bg);
         snake.desenhar();
         apple.desenhar(snake);
