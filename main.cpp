@@ -45,7 +45,7 @@ public:
         for (int i=0; i<contador;i++){
             int positionX = corpo[i].x;
             int positionY = corpo[i].y;
-            al_draw_filled_rectangle(positionX * cellSize, positionY * cellSize, (positionX * cellSize) + cellSize, (positionY * cellSize) + cellSize, al_map_rgb(255, 140, 0));
+            al_draw_filled_rounded_rectangle(positionX * cellSize, positionY * cellSize, (positionX * cellSize) + cellSize, (positionY * cellSize) + cellSize, (cellSize/4) , (cellSize/4), al_map_rgb(255, 140, 0));
         }
     }
     void randomPositionCobra(){
