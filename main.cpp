@@ -15,8 +15,8 @@ ALLEGRO_DISPLAY *janela = NULL;
 ALLEGRO_EVENT_QUEUE *fEventos = NULL;
 ALLEGRO_EVENT ev;
 
-int cellSize = 30;
-int cellCount = 20;
+const int cellSize = 30;
+const int cellCount = 20;
 
 struct vetor{
     int x;
@@ -36,7 +36,7 @@ class Cobra{
 
 public:
     int contador = 0;
-    vetor corpo[20];
+    vetor corpo[(cellCount * cellCount)];
 
     Cobra(){
         randomPositionCobra();
@@ -108,12 +108,15 @@ public:
         al_destroy_bitmap(objeto);
     }
 
-    void desenhar(Cobra cobra){
-        if (position.x == cobra.corpo[0].x && position.y == cobra.corpo[0].y){
-            this->randomPositionFood();
-            this->engolir();
-        };
+    void desenhar(){
         al_draw_bitmap(objeto,position.x *cellSize, position.y * cellSize,1);
+    }
+
+    bool comeu(Cobra cobra){
+        if (position.x == cobra.corpo[0].x && position.y == cobra.corpo[0].y){
+            return true;
+        }
+        return false;
     }
 
     void randomPositionFood(){
@@ -171,8 +174,13 @@ int main(){
 
         al_wait_for_event_timed(fEventos, &ev, 0.00166);
         al_clear_to_color(bg);
+        if(apple.comeu(snake)){
+            apple.engolir();
+            apple.randomPositionFood();
+            snake.aumentar();
+        }
         snake.desenhar();
-        apple.desenhar(snake);
+        apple.desenhar();
 
         //MOVE
         if(ev.type == ALLEGRO_EVENT_KEY_UP){
