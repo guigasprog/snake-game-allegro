@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string>
 
+
 using namespace std;
 
 ALLEGRO_DISPLAY *janela = NULL;
@@ -16,39 +17,91 @@ ALLEGRO_EVENT ev;
 
 int cellSize = 30;
 int cellCount = 20;
-class Cobra {
-public:
-    int positionX;
-    int positionY;
 
-    Cobra(){
-        randomPosition();
-    }
-    void desenhar() {
-        al_draw_filled_rectangle(positionX * cellSize, positionY * cellSize, (positionX * cellSize) + cellSize, (positionY * cellSize) + cellSize, al_map_rgb(255, 140, 0));
-    }
-    void randomPosition(){
-        this->positionX = rand() % (cellCount - 1);
-        this->positionY = rand() % (cellCount - 1);
-    }
-    void setPositionX(int x) {
-        this->positionX = x;
-    }
-    void setPositionY(int y) {
-        this->positionY = y;
-    }
+struct vetor{
+    int x;
+    int y;
+
+    void subir(){y --;};
+
+    void descer(){y ++;};
+
+    void esquerda(){x --;};
+
+    void direita(){x ++;};
+
 };
 
-class Comida {
+class Cobra{
+
 public:
-    int positionX;
-    int positionY;
+    int contador = 0;
+    vetor corpo[20];
+
+    Cobra(){
+        randomPositionCobra();
+    }
+    void desenhar() {
+        for (int i=0; i<contador;i++){
+            int positionX = corpo[i].x;
+            int positionY = corpo[i].y;
+            al_draw_filled_rectangle(positionX * cellSize, positionY * cellSize, (positionX * cellSize) + cellSize, (positionY * cellSize) + cellSize, al_map_rgb(255, 140, 0));
+        }
+    }
+    void randomPositionCobra(){
+        for(int i=0; i < 3;i++){
+            corpo[i] = {(6-i),9};
+            contador ++;
+        }
+    }
+
+    void subirCobra(){
+        int i = contador;
+        for(;i > 0;i--){
+            corpo[i] = corpo[i-1];
+        }
+        corpo[i].subir();
+    }
+    void descerCobra(){
+        int i = contador;
+        for(;i > 0;i--){
+            corpo[i] = corpo[i-1];
+        }
+        corpo[i].descer();
+    }
+    void esquerdaCobra(){
+        int i = contador;
+        for(;i > 0;i--){
+            corpo[i] = corpo[i-1];
+        }
+        corpo[i].esquerda();
+    }
+    void direitaCobra(){
+        int i = contador;
+        for(;i > 0;i--){
+            corpo[i] = corpo[i-1];
+        }
+        corpo[i].direita();
+    }
+
+    void aumentar(){
+        this->contador ++;
+    }
+
+};
+
+
+
+class Comida{
+
+public:
+    vetor position;
     int engolida;
     ALLEGRO_BITMAP *objeto;
 
     Comida(){
         objeto = al_load_bitmap("./png/apple.png");
-        randomPosition();
+        randomPositionFood();
         this->engolida = 0;
     }
     ~Comida(){
@@ -56,19 +109,30 @@ public:
     }
 
     void desenhar(Cobra cobra){
-        if(cobra.positionX == this->positionX && cobra.positionY == this->positionY){
-            randomPosition();
-            this->engolida++;
-        }
-        al_draw_bitmap(objeto,positionX *cellSize, positionY * cellSize,1);
+        if (position.x == cobra.corpo[0].x && position.y == cobra.corpo[0].y){
+            this->randomPositionFood();
+            this->engolir();
+        };
+        al_draw_bitmap(objeto,position.x *cellSize, position.y * cellSize,1);
     }
 
-    void randomPosition(){
-        this->positionX = rand() % (cellCount - 1);
-        this->positionY = rand() % (cellCount - 1);
+    void randomPositionFood(){
+        this->position.x = rand() % (20 - 1);
+        this->position.y = rand() % (20 - 1);
+    }
+    void engolir(){
+        this->engolida ++;
     }
 };
 
+
+void comeu(Comida comi, Cobra cob){
+    if (comi.position.x == cob.corpo[0].x && comi.position.y == cob.corpo[0].y){
+        cob.aumentar();
+        comi.randomPositionFood();
+        comi.engolir();
+    };
+}
 
 int main(){
 
@@ -101,13 +165,11 @@ int main(){
     ALLEGRO_COLOR cobra = al_map_rgb(43, 51,24);
 
 
-
-
-    Comida apple = Comida();
-    Cobra snake = Cobra();
+    Comida apple;
+    Cobra snake;
     while(true){
 
-        al_wait_for_event_timed(fEventos, &ev, 0.006);
+        al_wait_for_event_timed(fEventos, &ev, 0.00166);
         al_clear_to_color(bg);
         snake.desenhar();
         apple.desenhar(snake);
@@ -115,25 +177,25 @@ int main(){
         //MOVE
         if(ev.type == ALLEGRO_EVENT_KEY_UP){
             if(ev.keyboard.keycode == ALLEGRO_KEY_W) {
-                snake.positionY--;
+                snake.subirCobra();
             } else if(ev.keyboard.keycode == ALLEGRO_KEY_S) {
-                snake.positionY++;
+                snake.descerCobra();
             } else if(ev.keyboard.keycode == ALLEGRO_KEY_A) {
-                snake.positionX--;
+                snake.esquerdaCobra();
             } else if(ev.keyboard.keycode == ALLEGRO_KEY_D) {
-                snake.positionX++;
+                snake.direitaCobra();
             } else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE || ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE){
                 break;
             }
         }
-        if(snake.positionY == -1) {
-            snake.positionY = cellCount;
-        } else if(snake.positionY == cellCount) {
-            snake.positionY = 0;
-        } else if(snake.positionX == -1) {
-            snake.positionX = cellCount;
-        } else if(snake.positionX == cellCount) {
-            snake.positionX = 0;
+        if(snake.corpo[0].y == -1) {
+            snake.corpo[0].y = cellCount;
+        } else if(snake.corpo[0].y == cellCount) {
+            snake.corpo[0].y = 0;
+        } else if(snake.corpo[0].x == -1) {
+            snake.corpo[0].x = cellCount;
+        } else if(snake.corpo[0].x == cellCount) {
+            snake.corpo[0].x = 0;
         }
 
         al_draw_textf(font, al_map_rgb(0, 0, 0), 10, 20, 0, "Placar: %i" , apple.engolida);
