@@ -88,6 +88,16 @@ public:
         this->contador ++;
     }
 
+    bool bateu(){
+        vetor cabeca = corpo[0];
+        for(int i=1; i<contador;i++){
+            if(cabeca.x == corpo[i].x && cabeca.y == corpo[i].y){
+                return true;
+            }
+        }
+        return false;
+    }
+
 };
 
 
@@ -129,14 +139,6 @@ public:
 };
 
 
-void comeu(Comida comi, Cobra cob){
-    if (comi.position.x == cob.corpo[0].x && comi.position.y == cob.corpo[0].y){
-        cob.aumentar();
-        comi.randomPositionFood();
-        comi.engolir();
-    };
-}
-
 int main(){
 
     al_init();
@@ -170,7 +172,8 @@ int main(){
 
     Comida apple;
     Cobra snake;
-    while(true){
+    bool gameOver = false;
+    while(!gameOver){
 
         al_wait_for_event_timed(fEventos, &ev, 0.00166);
         al_clear_to_color(bg);
@@ -178,6 +181,9 @@ int main(){
             apple.engolir();
             apple.randomPositionFood();
             snake.aumentar();
+        }
+        if(snake.bateu()){
+            gameOver = true;
         }
         snake.desenhar();
         apple.desenhar();
@@ -193,7 +199,7 @@ int main(){
             } else if(ev.keyboard.keycode == ALLEGRO_KEY_D) {
                 snake.direitaCobra();
             } else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE || ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE){
-                break;
+                gameOver = true;
             }
         }
         if(snake.corpo[0].y == -1) {
@@ -211,7 +217,6 @@ int main(){
         al_rest(0.1);
 
     }
-
     al_destroy_display(janela);
     al_destroy_event_queue(fEventos);
 }
