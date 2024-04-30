@@ -16,7 +16,7 @@ ALLEGRO_EVENT_QUEUE *fEventos = NULL;
 ALLEGRO_EVENT ev;
 
 const int cellSize = 30;
-const int cellCount = 20;
+const int cellCount = 10;
 
 struct vetor{
     int x;
@@ -130,8 +130,8 @@ public:
     }
 
     void randomPositionFood(){
-        this->position.x = rand() % (20 - 1);
-        this->position.y = rand() % (20 - 1);
+        this->position.x = rand() % (cellCount - 1);
+        this->position.y = rand() % (cellCount - 1);
     }
     void engolir(){
         this->engolida ++;
@@ -173,6 +173,9 @@ int main(){
     Comida apple;
     Cobra snake;
     bool gameOver = false;
+
+    int mov;
+
     while(!gameOver){
 
         al_wait_for_event_timed(fEventos, &ev, 0.00166);
@@ -190,15 +193,16 @@ int main(){
 
         //MOVE
         if(ev.type == ALLEGRO_EVENT_KEY_UP){
-            if(ev.keyboard.keycode == ALLEGRO_KEY_W) {
-                snake.subirCobra();
-            } else if(ev.keyboard.keycode == ALLEGRO_KEY_S) {
-                snake.descerCobra();
-            } else if(ev.keyboard.keycode == ALLEGRO_KEY_A) {
-                snake.esquerdaCobra();
-            } else if(ev.keyboard.keycode == ALLEGRO_KEY_D) {
-                snake.direitaCobra();
-            } else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE || ev.keyboard.keycode == ALLEGRO_KEY_ESCAPE){
+            mov = ev.keyboard.keycode;
+            if(mov == ALLEGRO_KEY_W) {
+                if(snake.corpo[0].y-1 != snake.corpo[1].y) snake.subirCobra();
+            } else if(mov == ALLEGRO_KEY_S) {
+                if(snake.corpo[0].y+1 != snake.corpo[1].y) snake.descerCobra();
+            } else if(mov == ALLEGRO_KEY_A) {
+                if(snake.corpo[0].x-1 != snake.corpo[1].x) snake.esquerdaCobra();
+            } else if(mov == ALLEGRO_KEY_D) {
+                if(snake.corpo[0].x+1 != snake.corpo[1].x) snake.direitaCobra();
+            } else if(ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE || mov == ALLEGRO_KEY_ESCAPE){
                 gameOver = true;
             }
         }
