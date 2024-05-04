@@ -16,7 +16,7 @@ ALLEGRO_EVENT_QUEUE *fEventos = NULL;
 ALLEGRO_EVENT ev;
 
 const int cellSize = 30;
-const int cellCount = 10;
+const int cellCount = 20;
 
 struct vetor{
     int x;
@@ -108,9 +108,11 @@ public:
     vetor position;
     int engolida;
     ALLEGRO_BITMAP *objeto;
+    int sprite = 8;
+    int att=1;
 
     Comida(){
-        objeto = al_load_bitmap("./png/apple.png");
+        objeto = al_load_bitmap("./png/frame.png");
         randomPositionFood();
         this->engolida = 0;
     }
@@ -119,7 +121,14 @@ public:
     }
 
     void desenhar(){
-        al_draw_bitmap(objeto,position.x *cellSize, position.y * cellSize,1);
+        al_draw_scaled_bitmap(objeto,att*sprite,3*sprite,sprite,sprite,position.x *cellSize, position.y * cellSize,cellSize,cellSize,0);
+        //al_draw_bitmap_region(objeto,2*sprite,1*sprite,sprite,sprite,position.x *cellSize, position.y * cellSize,0);
+        //al_draw_bitmap(objeto,position.x *cellSize, position.y * cellSize,0);
+        if (att < 3){
+            att += 1;
+        }else{
+            att =1;
+        }
     }
 
     bool comeu(Cobra cobra){
