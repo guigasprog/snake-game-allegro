@@ -37,16 +37,28 @@ class Cobra{
 public:
     int contador = 0;
     vetor corpo[(cellCount * cellCount)];
+    ALLEGRO_BITMAP *objeto;
+    int flag = 0;
 
     Cobra(){
         randomPositionCobra();
+        objeto = al_load_bitmap("./png/frame.png");
     }
     void desenhar() {
-        for (int i=0; i<contador;i++){
-            int positionX = corpo[i].x;
-            int positionY = corpo[i].y;
-            al_draw_filled_rounded_rectangle(positionX * cellSize, positionY * cellSize, (positionX * cellSize) + cellSize, (positionY * cellSize) + cellSize, (cellSize/4) , (cellSize/4), al_map_rgb(255, 140, 0));
+        int i=0, positionX, positionY;
+        for (; i<contador;i++){
+            positionX = corpo[i].x;
+            positionY = corpo[i].y;
+            if(i == 0) {
+                al_draw_scaled_bitmap(objeto,2*8, 2*8,8,8,positionX*cellSize,positionY*cellSize,cellSize,cellSize,flag);
+            } else {
+                al_draw_scaled_bitmap(objeto,3*8, 1*8,8,8,positionX*cellSize,positionY*cellSize,cellSize,cellSize,flag);
+            }
+
         }
+        positionX = corpo[i].x;
+        positionY = corpo[i].y;
+        if(i == contador) al_draw_scaled_bitmap(objeto,0*8,0*8,8,8,positionX*cellSize,positionY*cellSize,cellSize,cellSize,flag);
     }
     void randomPositionCobra(){
         for(int i=0; i < 3;i++){
@@ -61,6 +73,7 @@ public:
             corpo[i] = corpo[i-1];
         }
         corpo[i].subir();
+        flag = 90;
     }
     void descerCobra(){
         int i = contador;
@@ -68,6 +81,7 @@ public:
             corpo[i] = corpo[i-1];
         }
         corpo[i].descer();
+        flag = 0;
     }
     void esquerdaCobra(){
         int i = contador;
@@ -75,6 +89,7 @@ public:
             corpo[i] = corpo[i-1];
         }
         corpo[i].esquerda();
+        flag = 90;
     }
     void direitaCobra(){
         int i = contador;
@@ -82,6 +97,7 @@ public:
             corpo[i] = corpo[i-1];
         }
         corpo[i].direita();
+        flag = 240;
     }
 
     void aumentar(){
@@ -147,6 +163,13 @@ public:
     }
 };
 
+struct tabuleiro {
+    int x;
+    int y;
+
+    ALLEGRO_BITMAP *fundo = al_load_bitmap("./png/frame.png");
+};
+
 
 int main(){
 
@@ -175,6 +198,7 @@ int main(){
 
 
     ALLEGRO_COLOR bg = al_map_rgb(173,204,96);
+    tabuleiro background;
     ALLEGRO_COLOR comida = al_map_rgb(43, 51,24);
     ALLEGRO_COLOR cobra = al_map_rgb(43, 51,24);
 
@@ -188,7 +212,12 @@ int main(){
     while(!gameOver){
 
         al_wait_for_event_timed(fEventos, &ev, 0.00166);
-        al_clear_to_color(bg);
+        for(background.x = cellCount; background.x > -1; background.x--){
+            for(background.y = cellCount; background.y > -1; background.y--) {
+                al_draw_scaled_bitmap(background.fundo,0*8,3*8,8,8,background.x*cellSize,background.y*cellSize,cellSize,cellSize,0);
+            }
+        }
+        //al_clear_to_color(bg);
         if(apple.comeu(snake)){
             apple.engolir();
             apple.randomPositionFood();
