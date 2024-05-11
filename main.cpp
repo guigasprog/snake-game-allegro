@@ -21,14 +21,15 @@ const int cellCount = 20;
 struct vetor{
     int x;
     int y;
+    float rad = 0;
 
-    void subir(){y --;};
+    void subir(){y --;rad=3.14;};
 
-    void descer(){y ++;};
+    void descer(){y ++;rad=0;};
 
-    void esquerda(){x --;};
+    void esquerda(){x --;rad=(3.14/2);};
 
-    void direita(){x ++;};
+    void direita(){x ++;rad=(3*3.14/2);};
 
 };
 
@@ -37,32 +38,40 @@ class Cobra{
 public:
     int contador = 0;
     vetor corpo[(cellCount * cellCount)];
-    ALLEGRO_BITMAP *objeto;
-    int flag = 0;
+    ALLEGRO_BITMAP *cabeca, *body, *rabo;
+    int deslX=0, deslY=0;
 
     Cobra(){
         randomPositionCobra();
-        objeto = al_load_bitmap("./png/frame.png");
+        cabeca = al_load_bitmap("./png/cabeca.png");
+        body = al_load_bitmap("./png/corpo.png");
+        rabo = al_load_bitmap("./png/rabo.png");
     }
+
     void desenhar() {
         int i=0, positionX, positionY;
-        for (; i<contador;i++){
+        float rad;
+        for (; i<contador-1;i++){
             positionX = corpo[i].x;
             positionY = corpo[i].y;
+            rad = corpo[i].rad;
+
             if(i == 0) {
-                al_draw_scaled_bitmap(objeto,2*8, 2*8,8,8,positionX*cellSize,positionY*cellSize,cellSize,cellSize,flag);
+                al_draw_scaled_rotated_bitmap(cabeca,4,4,(positionX-deslX)*cellSize,(positionY-deslY)*cellSize,(cellSize/8)+1,(cellSize/8)+1,rad,0);
             } else {
-                al_draw_scaled_bitmap(objeto,3*8, 1*8,8,8,positionX*cellSize,positionY*cellSize,cellSize,cellSize,flag);
+                al_draw_scaled_rotated_bitmap(body,4,4,(positionX-deslX)*cellSize,(positionY-deslY)*cellSize,(cellSize/8)+1,(cellSize/8)+1,rad,0);
             }
 
         }
         positionX = corpo[i].x;
         positionY = corpo[i].y;
-        if(i == contador) al_draw_scaled_bitmap(objeto,0*8,0*8,8,8,positionX*cellSize,positionY*cellSize,cellSize,cellSize,flag);
+        rad = corpo[i].rad;
+        al_draw_scaled_rotated_bitmap(rabo,4,4,(positionX-deslX)*cellSize,(positionY-deslY)*cellSize,(cellSize/8)+1,(cellSize/8)+1,rad,0);
+
     }
     void randomPositionCobra(){
         for(int i=0; i < 3;i++){
-            corpo[i] = {(6-i),9};
+            corpo[i] = {(6-i),9,(3*3.141592)/2};
             contador ++;
         }
     }
@@ -73,7 +82,8 @@ public:
             corpo[i] = corpo[i-1];
         }
         corpo[i].subir();
-        flag = 90;
+        deslX=0;
+        deslY=0;
     }
     void descerCobra(){
         int i = contador;
@@ -81,7 +91,8 @@ public:
             corpo[i] = corpo[i-1];
         }
         corpo[i].descer();
-        flag = 0;
+        deslX=0;
+        deslY=0;
     }
     void esquerdaCobra(){
         int i = contador;
@@ -89,7 +100,8 @@ public:
             corpo[i] = corpo[i-1];
         }
         corpo[i].esquerda();
-        flag = 90;
+        deslX=0;
+        deslY=0;
     }
     void direitaCobra(){
         int i = contador;
@@ -97,7 +109,8 @@ public:
             corpo[i] = corpo[i-1];
         }
         corpo[i].direita();
-        flag = 240;
+        deslX=0;
+        deslY=0;
     }
 
     void aumentar(){
@@ -137,7 +150,7 @@ public:
     }
 
     void desenhar(){
-        al_draw_scaled_bitmap(objeto,att*sprite,3*sprite,sprite,sprite,position.x *cellSize, position.y * cellSize,cellSize,cellSize,0);
+        al_draw_scaled_rotated_bitmap(objeto,4,4,position.x *cellSize, position.y * cellSize,cellSize,cellSize,0);
         //al_draw_bitmap_region(objeto,2*sprite,1*sprite,sprite,sprite,position.x *cellSize, position.y * cellSize,0);
         //al_draw_bitmap(objeto,position.x *cellSize, position.y * cellSize,0);
         if (att < 3){
