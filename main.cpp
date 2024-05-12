@@ -21,14 +21,15 @@ const int cellCount = 20;
 struct vetor{
     int x;
     int y;
+    float rad = 0;
 
-    void subir(){y --;};
+    void subir(){y --;rad=3.14;};
 
-    void descer(){y ++;};
+    void descer(){y ++;rad=0;};
 
-    void esquerda(){x --;};
+    void esquerda(){x --;rad=(3.14/2);};
 
-    void direita(){x ++;};
+    void direita(){x ++;rad=(3*3.14/2);};
 
 };
 
@@ -37,20 +38,40 @@ class Cobra{
 public:
     int contador = 0;
     vetor corpo[(cellCount * cellCount)];
+    ALLEGRO_BITMAP *cabeca, *body, *rabo;
+    int deslX=0, deslY=0;
 
     Cobra(){
         randomPositionCobra();
+        cabeca = al_load_bitmap("./png/cabeca.png");
+        body = al_load_bitmap("./png/corpo.png");
+        rabo = al_load_bitmap("./png/rabo.png");
     }
+
     void desenhar() {
-        for (int i=0; i<contador;i++){
-            int positionX = corpo[i].x;
-            int positionY = corpo[i].y;
-            al_draw_filled_rounded_rectangle(positionX * cellSize, positionY * cellSize, (positionX * cellSize) + cellSize, (positionY * cellSize) + cellSize, (cellSize/4) , (cellSize/4), al_map_rgb(255, 140, 0));
+        int i=0, positionX, positionY;
+        float rad;
+        for (; i<contador-1;i++){
+            positionX = corpo[i].x;
+            positionY = corpo[i].y;
+            rad = corpo[i].rad;
+
+            if(i == 0) {
+                al_draw_scaled_rotated_bitmap(cabeca,4,4,(positionX-deslX)*cellSize,(positionY-deslY)*cellSize,(cellSize/8)+1,(cellSize/8)+1,rad,0);
+            } else {
+                al_draw_scaled_rotated_bitmap(body,4,4,(positionX-deslX)*cellSize,(positionY-deslY)*cellSize,(cellSize/8)+1,(cellSize/8)+1,rad,0);
+            }
+
         }
+        positionX = corpo[i].x;
+        positionY = corpo[i].y;
+        rad = corpo[i].rad;
+        al_draw_scaled_rotated_bitmap(rabo,4,4,(positionX-deslX)*cellSize,(positionY-deslY)*cellSize,(cellSize/8)+1,(cellSize/8)+1,rad,0);
+
     }
     void randomPositionCobra(){
         for(int i=0; i < 3;i++){
-            corpo[i] = {(6-i),9};
+            corpo[i] = {(6-i),9,(3*3.141592)/2};
             contador ++;
         }
     }
@@ -61,6 +82,8 @@ public:
             corpo[i] = corpo[i-1];
         }
         corpo[i].subir();
+        deslX=0;
+        deslY=0;
     }
     void descerCobra(){
         int i = contador;
@@ -68,6 +91,8 @@ public:
             corpo[i] = corpo[i-1];
         }
         corpo[i].descer();
+        deslX=0;
+        deslY=0;
     }
     void esquerdaCobra(){
         int i = contador;
@@ -75,6 +100,8 @@ public:
             corpo[i] = corpo[i-1];
         }
         corpo[i].esquerda();
+        deslX=0;
+        deslY=0;
     }
     void direitaCobra(){
         int i = contador;
@@ -82,6 +109,8 @@ public:
             corpo[i] = corpo[i-1];
         }
         corpo[i].direita();
+        deslX=0;
+        deslY=0;
     }
 
     void aumentar(){
@@ -121,7 +150,7 @@ public:
     }
 
     void desenhar(){
-        al_draw_scaled_bitmap(objeto,att*sprite,3*sprite,sprite,sprite,position.x *cellSize, position.y * cellSize,cellSize,cellSize,0);
+        al_draw_scaled_rotated_bitmap(objeto,4,4,position.x *cellSize, position.y * cellSize,cellSize,cellSize,0);
         //al_draw_bitmap_region(objeto,2*sprite,1*sprite,sprite,sprite,position.x *cellSize, position.y * cellSize,0);
         //al_draw_bitmap(objeto,position.x *cellSize, position.y * cellSize,0);
         if (att < 3){
@@ -145,6 +174,13 @@ public:
     void engolir(){
         this->engolida ++;
     }
+};
+
+struct tabuleiro {
+    int x;
+    int y;
+
+    ALLEGRO_BITMAP *fundo = al_load_bitmap("./png/frame.png");
 };
 
 
@@ -175,6 +211,7 @@ int main(){
 
 
     ALLEGRO_COLOR bg = al_map_rgb(173,204,96);
+    tabuleiro background;
     ALLEGRO_COLOR comida = al_map_rgb(43, 51,24);
     ALLEGRO_COLOR cobra = al_map_rgb(43, 51,24);
 
@@ -187,8 +224,13 @@ int main(){
 
     while(!gameOver){
 
-        al_wait_for_event_timed(fEventos, &ev, 0.02);
-        al_clear_to_color(bg);
+        al_wait_for_event_timed(fEventos, &ev, 0.00166);
+        for(background.x = cellCount; background.x > -1; background.x--){
+            for(background.y = cellCount; background.y > -1; background.y--) {
+                al_draw_scaled_bitmap(background.fundo,0*8,3*8,8,8,background.x*cellSize,background.y*cellSize,cellSize,cellSize,0);
+            }
+        }
+        //al_clear_to_color(bg);
         if(apple.comeu(snake)){
             apple.engolir();
             apple.randomPositionFood();
