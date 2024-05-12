@@ -187,7 +187,7 @@ int main(){
 
     while(!gameOver){
 
-        al_wait_for_event_timed(fEventos, &ev, 0.00166);
+        al_wait_for_event_timed(fEventos, &ev, 0.02);
         al_clear_to_color(bg);
         if(apple.comeu(snake)){
             apple.engolir();
